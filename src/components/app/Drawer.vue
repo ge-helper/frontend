@@ -8,7 +8,7 @@
         <v-subheader>候選課程</v-subheader>
         <v-list-tile avatar>
           <v-list-tile-avatar>
-            <img :src="require('../assets/logo.png')">
+            <img :src="require('@/assets/logo.png')">
           </v-list-tile-avatar>
           <v-list-tile-content>
             <v-list-tile-title>歷史文化經典：《資治通鑑(東漢部分)》選讀</v-list-tile-title>

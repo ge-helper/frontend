@@ -90,7 +90,7 @@
 
 <script>
 export default {
-  name: 'CourseView',
+  name: 'CoursesView',
   data() {
     return {
       dialog: false,
