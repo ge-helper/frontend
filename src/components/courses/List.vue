@@ -24,7 +24,6 @@
                   {{ `${props.item.credit} 學分．${props.item.time}．人數 ${props.item.enrollment}/${props.item.size_limit}` }}
                 </div>
                 <div class="body-1 grey--text">{{ props.item.teachers }}</div>
-                <div>{{ props.item.course_no }}</div>
               </div>
             </v-card-title>
           </v-flex>

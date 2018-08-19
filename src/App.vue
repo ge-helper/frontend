@@ -4,6 +4,7 @@
     <app-toolbar/>
     <v-content>
       <router-view/>
+      <app-import-dialog/>
       <courses-view-dialog/>
     </v-content>
     <app-snackbar/>
@@ -11,18 +12,20 @@
 </template>
 
 <script>
-import Toolbar from '@/components/app/Toolbar';
 import Drawer from '@/components/app/Drawer';
-import Snackbar from '@/components/app/Snackbar';
+import Toolbar from '@/components/app/Toolbar';
+import ImportDialog from '@/components/app/ImportDialog';
 import ViewDialog from '@/components/courses/ViewDialog';
+import Snackbar from '@/components/app/Snackbar';
 
 export default {
   name: 'App',
   components: {
-    'app-toolbar': Toolbar,
     'app-drawer': Drawer,
-    'app-snackbar': Snackbar,
+    'app-toolbar': Toolbar,
+    'app-import-dialog': ImportDialog,
     'courses-view-dialog': ViewDialog,
+    'app-snackbar': Snackbar,
   },
 };
 </script>

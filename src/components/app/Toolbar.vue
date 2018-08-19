@@ -6,12 +6,21 @@
       icon
       @click="setDrawer(!drawer)">
       <v-icon v-if="!candidates.length">shopping_cart</v-icon>
-      <v-badge v-else right color="teal">
+      <v-badge v-else
+        right
+        color="teal">
         <span slot="badge">{{ candidates.length }}</span>
         <v-icon>shopping_cart</v-icon>
       </v-badge>
     </v-btn>
-    <v-toolbar-title>清大通識小幫手</v-toolbar-title>
+    <v-toolbar-items>
+      <v-btn flat
+        to="/"
+        active-class>
+        <v-toolbar-title>清大通識小幫手</v-toolbar-title>
+      </v-btn>
+    </v-toolbar-items>
+
     <v-spacer></v-spacer>
     <v-btn flat
       icon

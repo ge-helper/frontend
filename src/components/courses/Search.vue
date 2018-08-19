@@ -11,6 +11,7 @@
             hide-details
             append-icon="search"
             v-model="preSearch"
+            @click:append="search"
             @keypress.enter="search" />
         </v-flex>
       </v-layout>

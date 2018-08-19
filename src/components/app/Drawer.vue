@@ -4,8 +4,9 @@
     <v-layout column
       fill-height
       class="pb-2">
-      <v-list two-line>
-        <v-subheader>候選課程</v-subheader>
+      <v-subheader>候選課程</v-subheader>
+      <v-list two-line
+        v-if="candidateCourses.length">
         <template v-for="(c, i) in candidateCourses">
           <v-divider v-if="i"
             :key="i" />
@@ -22,11 +23,27 @@
           </v-list-tile>
         </template>
       </v-list>
-      <v-spacer/>
+      <v-layout v-if="!candidateCourses.length"
+        style="flex-grow: 1;"
+        column
+        justify-center
+        align-center>
+        <img :src="require('@/assets/logo.png')"
+          width="100">
+        <div class="body-2">尚無候選課程</div>
+        <div class="caption grey--text">
+          <span class="link" @click="setImportDialog(true)">匯入修課紀錄</span>
+          <span>或去</span>
+          <router-link to="/courses">通識列表</router-link>
+          <span>逛逛</span>
+        </div>
+      </v-layout>
+      <v-spacer v-else/>
       <v-divider/>
       <v-btn ref="copy"
         flat
         large
+        :disabled="!candidateCourses.length"
         :data-clipboard-text="candidateString"
         color="primary"
         @click="launchSnackbar('複製成功')">複製科號與課名</v-btn>
@@ -53,7 +70,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(['setViewDialog', 'setView', 'launchSnackbar']),
+    ...mapMutations(['setViewDialog', 'setImportDialog', 'setView', 'launchSnackbar']),
     openViewDialog(course_no) {
       this.setView(course_no);
       this.setViewDialog(true);
@@ -64,3 +81,12 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.link {
+  cursor: pointer;
+  color: #1976d2;
+  text-decoration: underline;
+  background-color: transparent;
+}
+</style>

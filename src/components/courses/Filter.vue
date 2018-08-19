@@ -2,11 +2,11 @@
   <div class="blue-grey lighten-5">
     <v-container style="max-width: 750px;">
       <h3 class="subheading">
-        {{ `${results.length} 個搜尋` }}
+        <span>{{ `${results.length} 個搜尋` }}</span>
         <span class="font-weight-medium">{{ filter.search }}</span>結果
       </h3>
       <div>
-        <filter-dialog :color="$vuetify.breakpoint.xs && chips.length ? 'primary' : 'secondary'"/>
+        <filter-dialog :color="$vuetify.breakpoint.xs && chips.length ? 'primary' : 'secondary'" />
         <v-menu v-if="!$vuetify.breakpoint.xs"
           offset-y
           :close-on-content-click="false">

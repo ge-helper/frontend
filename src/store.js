@@ -91,6 +91,7 @@ export default new Vuex.Store({
     snackbar: false,
     snackbarText: '',
 
+    importDialog: false,
     loading: false,
     logs: [],
     candidates: [],
@@ -204,6 +205,9 @@ export default new Vuex.Store({
     launchSnackbar(state, snackbarText) {
       state.snackbarText = snackbarText;
       state.snackbar = true;
+    },
+    setImportDialog(state, visible) {
+      state.importDialog = visible;
     },
     setSearch(state, search) {
       state.search = search;
