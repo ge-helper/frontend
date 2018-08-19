@@ -5,8 +5,9 @@
     <v-btn flat
       icon
       @click="setDrawer(!drawer)">
-      <v-badge right>
-        <span slot="badge">10</span>
+      <v-icon v-if="!candidates.length">shopping_cart</v-icon>
+      <v-badge v-else right color="teal">
+        <span slot="badge">{{ candidates.length }}</span>
         <v-icon>shopping_cart</v-icon>
       </v-badge>
     </v-btn>
@@ -31,7 +32,7 @@ import { mapState, mapMutations } from 'vuex';
 export default {
   name: 'AppToolbar',
   computed: {
-    ...mapState(['drawer']),
+    ...mapState(['drawer', 'candidates']),
   },
   methods: {
     ...mapMutations(['setDrawer']),

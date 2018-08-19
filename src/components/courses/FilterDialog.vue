@@ -5,7 +5,7 @@
     width="600">
     <v-btn slot="activator"
       outline
-      color="secondary"
+      :color="color"
       class="ml-0 my-3">
       <v-icon left
         dark>filter_list</v-icon>
@@ -112,7 +112,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn flat>取消</v-btn>
+        <v-btn flat @click="dialogVisible = false">取消</v-btn>
         <v-btn color="primary"
           flat
           @click="applyFilter">套用</v-btn>
@@ -143,12 +143,23 @@ const rowHeaders = [
 
 export default {
   name: 'CoursesFilterDialog',
+  props: {
+    color: {
+      type: String,
+      default: 'secondary'
+    },
+  },
   data() {
     return {
       dialog: false,
       departmentOptionLimit: 3,
       columnHeaders,
       rowHeaders,
+      categories: [],
+      credits: [],
+      languages: [],
+      departments: [],
+      times: [],
     };
   },
   computed: {
@@ -165,28 +176,27 @@ export default {
       };
       return acc;
     }, {}),
-    ...['categories', 'credits', 'languages', 'departments', 'times'].reduce(
-      (acc, cur) => {
-        acc[cur] = {
-          get() {
-            return this.filter[cur];
-          },
-          set(value) {
-            const obj = {};
-            obj[cur] = value;
-            this.setFilter(obj);
-          },
-        };
-        return acc;
-      },
-      {}
-    ),
     dialogVisible: {
       get() {
         return this.dialog;
       },
       set(value) {
-        if (value === false) this.departmentOptionLimit = 3;
+        if (value) {
+          const {
+            categories,
+            credits,
+            languages,
+            departments,
+            times,
+          } = this.filter;
+          this.categories = categories.slice();
+          this.credits = credits.slice();
+          this.languages = languages.slice();
+          this.departments = departments.slice();
+          this.times = times.slice();
+        } else {
+          this.departmentOptionLimit = 3;
+        }
         this.dialog = value;
       },
     },
@@ -195,8 +205,16 @@ export default {
     ...mapActions(['doFilter']),
     ...mapMutations(['setFilter']),
     applyFilter() {
-      this.dialogVisible = false;
+      const { categories, credits, languages, departments, times } = this;
+      this.setFilter({
+        categories,
+        credits,
+        languages,
+        departments,
+        times,
+      });
       this.doFilter();
+      this.dialogVisible = false;
     },
   },
 };

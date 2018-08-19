@@ -6,7 +6,7 @@
         <span class="font-weight-medium">{{ filter.search }}</span>結果
       </h3>
       <div>
-        <filter-dialog/>
+        <filter-dialog :color="$vuetify.breakpoint.xs && chips.length ? 'primary' : 'secondary'"/>
         <v-menu v-if="!$vuetify.breakpoint.xs"
           offset-y
           :close-on-content-click="false">
@@ -141,6 +141,7 @@ export default {
         ? this.filter[chip.filter].filter(v => !chip.value.includes(v))
         : this.filter[chip.filter].filter(v => chip.value !== v);
       this.setFilter(newFilter);
+      this.doFilter();
     },
     clearAll() {
       this.clearFilter();

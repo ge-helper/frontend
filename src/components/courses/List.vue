@@ -7,7 +7,7 @@
         slot-scope="props"
         flat
         class="my-3 transparent"
-        @click.native="setViewDialog(true)"
+        @click.native="openViewDialog(props.item.course_no)"
         style="cursor: pointer;">
         <v-layout>
           <v-flex style="flex: 0 0 auto; width: 20%; max-width: 80px;">
@@ -48,10 +48,11 @@ export default {
     ...mapState(['results']),
   },
   methods: {
-    ...mapMutations(['setViewDialog']),
+    ...mapMutations(['setView', 'setViewDialog']),
+    openViewDialog(course_no) {
+      this.setView(course_no);
+      this.setViewDialog(true);
+    },
   },
 };
 </script>
-
-<style>
-</style>

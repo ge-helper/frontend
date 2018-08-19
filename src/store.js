@@ -59,6 +59,11 @@ const GES = GE10710_0815.map(ge => ({
   language: ge.offered_in_english ? '英文' : '中文',
 }));
 
+const mapCourseNo = GES.reduce((acc, cur) => {
+  acc[cur.course_no] = cur;
+  return acc;
+}, {});
+
 const counter = (obj, key) => {
   obj[key] = obj.hasOwnProperty(key) ? obj[key] + 1 : 1;
 };
@@ -83,6 +88,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     drawer: true,
+    snackbar: false,
+    snackbarText: '',
 
     loading: false,
     logs: [],
@@ -104,14 +111,12 @@ export default new Vuex.Store({
         languageCount = {},
         departmentCount = {};
 
-      searchResults.forEach(
-        ({ category, credit, language, department }) => {
-          counter(categoryCount, category);
-          counter(creditCount, credit);
-          counter(languageCount, language);
-          counter(departmentCount, department);
-        }
-      );
+      searchResults.forEach(({ category, credit, language, department }) => {
+        counter(categoryCount, category);
+        counter(creditCount, credit);
+        counter(languageCount, language);
+        counter(departmentCount, department);
+      });
 
       return {
         categoryOptions: sorter(categoryCount),
@@ -119,6 +124,12 @@ export default new Vuex.Store({
         languageOptions: sorter(languageCount),
         departmentOptions: sorter(departmentCount),
       };
+    },
+    viewCourse({ view }) {
+      return mapCourseNo[view];
+    },
+    candidateCourses({ candidates }) {
+      return candidates.map(no => mapCourseNo[no]);
     },
   },
   actions: {
@@ -187,8 +198,12 @@ export default new Vuex.Store({
     setDrawer(state, visible) {
       state.drawer = visible;
     },
-    setViewDialog(state, visible) {
-      state.viewDialog = visible;
+    setSnackbar(state, visible) {
+      state.snackbar = visible;
+    },
+    launchSnackbar(state, snackbarText) {
+      state.snackbarText = snackbarText;
+      state.snackbar = true;
     },
     setSearch(state, search) {
       state.search = search;
@@ -204,6 +219,21 @@ export default new Vuex.Store({
     },
     setResults(state, results) {
       state.results = results;
+    },
+    setView(state, view) {
+      state.view = view;
+    },
+    setViewDialog(state, visible) {
+      state.viewDialog = visible;
+    },
+    addCandidate(state, course_no) {
+      if (state.candidates.indexOf(course_no) >= 0) return;
+      state.candidates.push(course_no);
+    },
+    removeCandidate(state, course_no) {
+      const loc = state.candidates.indexOf(course_no);
+      if (loc === -1) return;
+      state.candidates.splice(loc, 1);
     },
   },
 });
