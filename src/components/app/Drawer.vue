@@ -6,7 +6,8 @@
       class="pb-2">
       <v-list two-line>
         <v-subheader>候選課程</v-subheader>
-        <v-list-tile avatar>
+        <v-list-tile avatar
+          @click="setViewDialog(true)">
           <v-list-tile-avatar>
             <img :src="require('@/assets/logo.png')">
           </v-list-tile-avatar>
@@ -20,18 +21,25 @@
       <v-spacer></v-spacer>
       <v-divider></v-divider>
       <v-btn flat
+        large
         color="primary">複製科號與課名</v-btn>
     </v-layout>
   </v-navigation-drawer>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
+
 export default {
   name: 'AppDrawer',
-  data() {
-    return {
-      drawer: true,
-    };
+  computed: {
+    drawer: {
+      get: mapState(['drawer']).drawer,
+      set: mapMutations(['setDrawer']).setDrawer,
+    },
+  },
+  methods: {
+    ...mapMutations(['setViewDialog']),
   },
 };
 </script>

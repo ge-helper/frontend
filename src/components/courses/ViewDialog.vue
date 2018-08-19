@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog"
+  <v-dialog v-model="viewDialog"
     scrollable
     :fullscreen="$vuetify.breakpoint.xs"
     width="640">
@@ -70,7 +70,6 @@
                   style="font-size: 13px;"
                   :key="i + infos.length">{{ `${info.name}：${info.value}` }}</div>
               </template>
-
             </div>
           </v-tab-item>
         </v-tabs>
@@ -79,21 +78,22 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn flat
-          @click="dialog = false">取消</v-btn>
+          @click="setViewDialog(false)">取消</v-btn>
         <v-btn color="primary"
           flat
-          @click="dialog = false">加入候選</v-btn>
+          @click="setViewDialog(false)">加入候選</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
+
 export default {
-  name: 'CoursesView',
+  name: 'CoursesViewDialog',
   data() {
     return {
-      dialog: false,
       infos: [
         {
           name: '科號',
@@ -184,6 +184,15 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    viewDialog: {
+      get: mapState(['viewDialog']).viewDialog,
+      set: mapMutations(['setViewDialog']).setViewDialog,
+    },
+  },
+  methods: {
+    ...mapMutations(['setViewDialog']),
   },
 };
 </script>

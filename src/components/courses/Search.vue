@@ -9,7 +9,9 @@
           <v-text-field label="課名／老師／科號／時間"
             solo
             hide-details
-            append-icon="search" />
+            append-icon="search"
+            v-model="preSearch"
+            @keypress.enter="search" />
         </v-flex>
       </v-layout>
     </v-container>
@@ -17,8 +19,23 @@
 </template>
 
 <script>
+import { mapMutations, mapActions } from 'vuex';
+
 export default {
   name: 'CoursesSearch',
+  data() {
+    return {
+      preSearch: '',
+    };
+  },
+  methods: {
+    ...mapMutations(['setSearch']),
+    ...mapActions(['doSearch']),
+    search() {
+      this.setSearch(this.preSearch);
+      this.doSearch();
+    },
+  },
 };
 </script>
 

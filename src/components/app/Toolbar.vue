@@ -3,7 +3,8 @@
     app
     class="white">
     <v-btn flat
-      icon>
+      icon
+      @click="setDrawer(!drawer)">
       <v-badge right>
         <span slot="badge">10</span>
         <v-icon>shopping_cart</v-icon>
@@ -11,7 +12,6 @@
     </v-btn>
     <v-toolbar-title>清大通識小幫手</v-toolbar-title>
     <v-spacer></v-spacer>
-
     <v-btn flat
       icon
       to="/courses"
@@ -26,8 +26,16 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
+
 export default {
   name: 'AppToolbar',
+  computed: {
+    ...mapState(['drawer']),
+  },
+  methods: {
+    ...mapMutations(['setDrawer']),
+  },
 };
 </script>
 

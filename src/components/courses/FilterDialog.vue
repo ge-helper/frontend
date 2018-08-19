@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog"
+  <v-dialog v-model="dialogVisible"
     scrollable
     :fullscreen="$vuetify.breakpoint.xs"
     width="600">
@@ -19,8 +19,8 @@
         <v-tabs color="cyan"
           slider-color="yellow"
           dark>
-          <v-tab>基本</v-tab>
-          <v-tab>衝堂時間</v-tab>
+          <v-tab>一般</v-tab>
+          <v-tab>時間</v-tab>
           <v-tab-item>
             <v-container class="pb-0">
               <v-layout wrap>
@@ -28,75 +28,63 @@
                   v-if="$vuetify.breakpoint.xs"
                   sm4
                   class="mb-3">
-                  <h4 class="mb-2">小類</h4>
-                  <v-checkbox hide-details
+                  <h4 class="mb-2">類別</h4>
+                  <v-checkbox v-for="opt in categoryOptions"
+                    :key="opt[0]"
+                    v-model="categories"
+                    :value="opt[0]"
+                    hide-details
                     class="mt-0"
-                    label="核通 1 (12)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="核通 2 (20)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="核通 3 (8)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="核通 4 (3)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="核通 5 (8)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="核通 6 (22)" />
+                    :label="`${opt[0]} (${opt[1]})`" />
                 </v-flex>
                 <v-flex xs12
                   sm4
                   class="mb-3">
                   <h4 class="mb-2">學分</h4>
-                  <v-checkbox hide-details
+                  <v-checkbox v-for="opt in creditOptions"
+                    :key="opt[0]"
+                    v-model="credits"
+                    :value="opt[0]"
+                    hide-details
                     class="mt-0"
-                    label="1 (12)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="2 (3)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="3 (7)" />
+                    :label="`${opt[0]} (${opt[1]})`" />
                 </v-flex>
                 <v-flex xs12
                   sm4
                   class="mb-3">
                   <h4 class="mb-2">授課語言</h4>
-                  <v-checkbox hide-details
+                  <v-checkbox v-for="opt in languageOptions"
+                    :key="opt[0]"
+                    v-model="languages"
+                    :value="opt[0]"
+                    hide-details
                     class="mt-0"
-                    label="中文 (50)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="英文 (3)" />
+                    :label="`${opt[0]} (${opt[1]})`" />
                 </v-flex>
                 <v-flex xs12
                   sm4
                   class="mb-3">
-                  <h4 class="mb-2">開課系所</h4>
-                  <v-checkbox hide-details
+                  <h4 class="mb-2">開課單位</h4>
+                  <v-checkbox v-for="opt in departmentOptions.slice(0, departmentOptionLimit)"
+                    :key="opt[0]"
+                    v-model="departments"
+                    :value="opt[0]"
+                    hide-details
                     class="mt-0"
-                    label="醫工所 (12)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="醫環系 (20)" />
-                  <v-checkbox hide-details
-                    class="mt-0"
-                    label="化工系 (8)" />
-                  <v-btn small
+                    :label="`${opt[0]} (${opt[1]})`" />
+                  <v-btn v-if="departmentOptionLimit < departmentOptions.length"
+                    small
                     flat
                     color="primary"
-                    class="mx-0">更多</v-btn>
+                    class="mx-0"
+                    @click="departmentOptionLimit += 4">更多</v-btn>
                 </v-flex>
               </v-layout>
             </v-container>
           </v-tab-item>
           <v-tab-item>
             <v-container>
-              <h4 class="mb-2">已經排課的時間（匯入修課紀錄自動勾選）</h4>
+              <h4 class="mb-2">空堂時間（匯入修課紀錄自動勾選）</h4>
               <!-- (13 + 1) * (5 + 1) -->
               <v-layout wrap
                 class="time-table"
@@ -108,9 +96,11 @@
                   text-xs-center>
                   <span v-if="i === 1 || j === 1"
                     style="line-height: 32px;">
-                    {{ i === 1 ? header[j] : header[6 * i - 5] }}
+                    {{ i === 1 ? columnHeaders[j - 1] : rowHeaders[i - 1] }}
                   </span>
                   <v-checkbox v-else
+                    v-model="times"
+                    :value="`${columnHeaders[j - 1]}${rowHeaders[i - 1]}`"
                     hide-details
                     class="mt-0" />
                 </v-flex>
@@ -125,42 +115,89 @@
         <v-btn flat>取消</v-btn>
         <v-btn color="primary"
           flat
-          @click="dialog = false">套用</v-btn>
+          @click="applyFilter">套用</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-const header = {
-  1: '',
-  2: 'M',
-  3: 'T',
-  4: 'W',
-  5: 'R',
-  6: 'F',
-  7: '1',
-  13: '2',
-  19: '3',
-  25: '4',
-  31: 'n',
-  37: '5',
-  43: '6',
-  49: '7',
-  55: '8',
-  61: '9',
-  67: 'a',
-  73: 'b',
-  79: 'c',
-};
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
+const columnHeaders = ['', 'M', 'T', 'W', 'R', 'F'];
+const rowHeaders = [
+  '',
+  '1',
+  '2',
+  '3',
+  '4',
+  'n',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  'a',
+  'b',
+  'c',
+];
 
 export default {
   name: 'CoursesFilterDialog',
   data() {
     return {
       dialog: false,
-      header,
+      departmentOptionLimit: 3,
+      columnHeaders,
+      rowHeaders,
     };
+  },
+  computed: {
+    ...mapState(['filter']),
+    ...mapGetters(['option']),
+    ...[
+      'categoryOptions',
+      'creditOptions',
+      'languageOptions',
+      'departmentOptions',
+    ].reduce((acc, cur) => {
+      acc[cur] = function() {
+        return this.option[cur];
+      };
+      return acc;
+    }, {}),
+    ...['categories', 'credits', 'languages', 'departments', 'times'].reduce(
+      (acc, cur) => {
+        acc[cur] = {
+          get() {
+            return this.filter[cur];
+          },
+          set(value) {
+            const obj = {};
+            obj[cur] = value;
+            this.setFilter(obj);
+          },
+        };
+        return acc;
+      },
+      {}
+    ),
+    dialogVisible: {
+      get() {
+        return this.dialog;
+      },
+      set(value) {
+        if (value === false) this.departmentOptionLimit = 3;
+        this.dialog = value;
+      },
+    },
+  },
+  methods: {
+    ...mapActions(['doFilter']),
+    ...mapMutations(['setFilter']),
+    applyFilter() {
+      this.dialogVisible = false;
+      this.doFilter();
+    },
   },
 };
 </script>
