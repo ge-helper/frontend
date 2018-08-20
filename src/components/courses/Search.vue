@@ -6,7 +6,7 @@
       style="max-width: 750px;">
       <v-layout align-center>
         <v-flex>
-          <v-text-field label="課名／老師／科號／時間"
+          <v-text-field label="課名／時間／老師／科號"
             solo
             hide-details
             append-icon="search"

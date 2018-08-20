@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Fuse from 'fuse.js';
-import GE10710_0815 from '@/assets/GE10710_0815.json';
+import GE_10710 from '@/assets/GE_10710_0820.json';
+import GE_GRADE_DISTRIBUTION_10710 from '@/assets/GE_GRADE_DISTRIBUTION_32.json';
 
 const mapCategory = {
   '': '',
@@ -44,7 +45,7 @@ const mapDepartment = {
   'XA  ': '抵免課程(大)',
 };
 
-const GES = GE10710_0815.map(ge => ({
+const GES = GE_10710.map(ge => ({
   ...ge,
   teachers: ge.teachers.map(t => t.split('\t')[0]).join('、'),
   room:
@@ -57,6 +58,7 @@ const GES = GE10710_0815.map(ge => ({
   category: mapCategory[ge.category],
   department: mapDepartment[ge.course_no.slice(5, 9)],
   language: ge.offered_in_english ? '英文' : '中文',
+  grade_distribution: GE_GRADE_DISTRIBUTION_10710[ge.course_no],
 }));
 
 const mapCourseNo = GES.reduce((acc, cur) => {
@@ -148,6 +150,7 @@ export default new Vuex.Store({
           keys: [
             'course_title_zh',
             'course_title_en',
+            'description',
             'teachers',
             'time',
             'course_no',
