@@ -2,8 +2,12 @@
   <div>
     <h4 class="px-3 pt-3">課程資訊</h4>
     <v-layout wrap>
-      <v-flex v-for="i in 2" :key="i" xs12 sm6>
-        <v-list dense class="py-0">
+      <v-flex v-for="i in 2"
+        :key="i"
+        xs12
+        sm6>
+        <v-list dense
+          class="py-0">
           <template v-for="(info, j) in infos.slice(i * 4 - 4, i * 4)">
             <v-list-tile :key="j + infos.length">
               <v-list-tile-content>{{ info }}</v-list-tile-content>
@@ -15,12 +19,18 @@
     </v-layout>
     <div class="pa-3">
       <h4 class="pb-2">成績分佈</h4>
-      <canvas v-show="hasGradeDistribution" ref="chart" style="width: 100%;" :height="$vuetify.breakpoint.xs ? 500 : ''" />
-      <p v-if="!hasGradeDistribution" class="ma-0" style="font-size: 13px;">資料不足</p>
+      <canvas v-show="hasGradeDistribution"
+        ref="chart"
+        style="width: 100%;"
+        :height="$vuetify.breakpoint.xs ? 500 : ''" />
+      <p v-if="!hasGradeDistribution"
+        class="ma-0"
+        style="font-size: 13px;">資料不足</p>
     </div>
     <div class="pa-3">
       <h4 class="pb-2">課程簡述</h4>
-      <p class="ma-0" style="font-size: 13px;">
+      <p class="ma-0"
+        style="font-size: 13px;">
         {{ description }}
       </p>
     </div>

@@ -11,8 +11,8 @@
             hide-details
             append-icon="search"
             v-model="preSearch"
-            @click:append="search"
-            @keypress.enter="search" />
+            @click:append="doSearch"
+            @keypress.enter="doSearch" />
         </v-flex>
       </v-layout>
     </v-container>
@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { mapMutations, mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
   name: 'CoursesSearch',
@@ -29,12 +29,15 @@ export default {
       preSearch: '',
     };
   },
+  computed: {
+    ...mapState(['search']),
+  },
   methods: {
     ...mapMutations(['setSearch']),
-    ...mapActions(['doSearch']),
-    search() {
+    doSearch() {
+      if (this.preSearch.trim() === this.search.trim()) return;
       this.setSearch(this.preSearch);
-      this.doSearch();
+      this.$store.dispatch('doSearch');
     },
   },
 };

@@ -102,6 +102,7 @@ export default new Vuex.Store({
     searchResults: GES,
     filter: { ...initialFilter },
     results: GES,
+    pagination: {},
     sort: '',
 
     viewDialog: false,
@@ -161,6 +162,7 @@ export default new Vuex.Store({
       commit('setSearchResults', searchResults);
       commit('clearFilter');
       commit('setResults', searchResults);
+      commit('setPagination', { page: 1 });
     },
     doFilter({ commit, state }) {
       // results
@@ -241,6 +243,9 @@ export default new Vuex.Store({
       const loc = state.candidates.indexOf(course_no);
       if (loc === -1) return;
       state.candidates.splice(loc, 1);
+    },
+    setPagination(state, pagination) {
+      state.pagination = { ...state.pagination, ...pagination };
     },
   },
 });

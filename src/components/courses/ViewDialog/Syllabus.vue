@@ -1,10 +1,21 @@
 <template>
   <div>
-    <iframe v-if="viewCourse && viewCourse.syllabus.isPDF" :src="syllabusURL" @load="loaded = viewCourse.course_no" style="width:100%; height:calc(100vh - 155px); max-height:500px;" frameborder="0" />
-    <v-layout v-if="isLoading" class="loading" justify-center align-center>
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    <iframe v-if="viewCourse && viewCourse.syllabus.isPDF"
+      :src="syllabusURL"
+      @load="loaded = viewCourse.course_no"
+      style="width:100%; height:calc(100vh - 155px); max-height:500px;"
+      frameborder="0" />
+    <v-layout v-if="isLoading"
+      class="loading"
+      justify-center
+      align-center>
+      <v-progress-circular indeterminate
+        color="primary"></v-progress-circular>
     </v-layout>
-    <div class="pa-3" style="font-size: 13px;" v-if="viewCourse && !viewCourse.syllabus.isPDF" v-html="syllabusText" />
+    <div class="pa-3"
+      style="font-size: 13px;"
+      v-if="viewCourse && !viewCourse.syllabus.isPDF"
+      v-html="syllabusText" />
   </div>
 </template>
 

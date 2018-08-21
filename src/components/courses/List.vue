@@ -1,7 +1,8 @@
 <template>
   <v-container style="max-width: 750px;">
     <courses-sort/>
-    <v-data-iterator rows-per-page-text="每頁筆數"
+    <v-data-iterator :pagination.sync="pagination"
+      rows-per-page-text="每頁筆數"
       :items="results">
       <v-card slot="item"
         slot-scope="props"
@@ -45,9 +46,17 @@ export default {
   },
   computed: {
     ...mapState(['results']),
+    pagination: {
+      get() {
+        return this.$store.state.pagination;
+      },
+      set(value) {
+        this.setPagination(value);
+      },
+    },
   },
   methods: {
-    ...mapMutations(['setView', 'setViewDialog']),
+    ...mapMutations(['setView', 'setViewDialog', 'setPagination']),
     openViewDialog(course_no) {
       this.setView(course_no);
       this.setViewDialog(true);

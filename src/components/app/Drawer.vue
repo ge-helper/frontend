@@ -32,7 +32,8 @@
           width="100">
         <div class="body-2">尚無候選課程</div>
         <div class="caption grey--text">
-          <span class="link" @click="setImportDialog(true)">匯入修課紀錄</span>
+          <span class="link"
+            @click="setImportDialog(true)">匯入修課紀錄</span>
           <span>或去</span>
           <router-link to="/courses">通識列表</router-link>
           <span>逛逛</span>
@@ -70,7 +71,12 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(['setViewDialog', 'setImportDialog', 'setView', 'launchSnackbar']),
+    ...mapMutations([
+      'setViewDialog',
+      'setImportDialog',
+      'setView',
+      'launchSnackbar',
+    ]),
     openViewDialog(course_no) {
       this.setView(course_no);
       this.setViewDialog(true);
