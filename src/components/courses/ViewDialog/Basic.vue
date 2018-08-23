@@ -21,8 +21,7 @@
       <h4 class="pb-2">成績分佈</h4>
       <canvas v-show="hasGradeDistribution"
         ref="chart"
-        style="width: 100%;"
-        :height="$vuetify.breakpoint.xs ? 500 : ''" />
+        style="width: 100%;"/>
       <p v-if="!hasGradeDistribution"
         class="ma-0"
         style="font-size: 13px;">資料不足</p>
@@ -118,7 +117,7 @@ export default {
   },
   mounted() {
     this.chart = new Chart(this.$refs.chart, {
-      type: this.$vuetify.breakpoint.xs ? 'horizontalBar' : 'bar',
+      type: 'bar',
       data: {
         labels: [
           'A+',

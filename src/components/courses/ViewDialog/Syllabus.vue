@@ -3,7 +3,7 @@
     <iframe v-if="viewCourse && viewCourse.syllabus.isPDF"
       :src="syllabusURL"
       @load="loaded = viewCourse.course_no"
-      style="width:100%; height:calc(100vh - 155px); max-height:500px;"
+      style="width:100%; height:calc(100vh - 155px); max-height:calc(90vh - 48px - 155px);"
       frameborder="0" />
     <v-layout v-if="isLoading"
       class="loading"

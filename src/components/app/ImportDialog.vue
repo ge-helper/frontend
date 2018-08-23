@@ -92,6 +92,11 @@
                   :rules="urlRules"
                   v-model="url"
                   placeholder="https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/select_entry.php?ACIXSTORE=6991bcrjqktcjampue1nrugeu0" />
+                <v-checkbox v-if="importType === IMPORT_TYPE_AUTO"
+                  label="我願意匿名分享成績分布給其他同學"
+                  v-model="gd"
+                  hide-details
+                  class="my-0" />
                 <img :src="importType === IMPORT_TYPE_AUTO ? 'https://i.imgur.com/WfrI3x0.gif' : 'https://i.imgur.com/tyn7kAo.gif'"
                   style="width: 100%" />
               </v-form>
@@ -114,14 +119,15 @@
           @click="step++">我同意</v-btn>
         <v-btn v-show="step === 3"
           flat
-          color="primary">匯入</v-btn>
+          color="primary"
+          @click="submit">匯入</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapMutations, mapActions } from 'vuex';
 import { parseCourseLog } from '@/common/parseCourseLog';
 
 const IMPORT_TYPE_AUTO = 'IMPORT_TYPE_AUTO';
@@ -138,6 +144,7 @@ export default {
       valid: true,
       url: '',
       text: '',
+      gd: false,
       urlRules: [
         v => !!v || '必填',
         v =>
@@ -172,6 +179,7 @@ export default {
   },
   methods: {
     ...mapMutations(['setImportDialog']),
+    ...mapActions(['getCourseLogs', 'logCourseLogs']),
     validateText(v) {
       this.tempLogs = parseCourseLog(v);
       return this.tempLogs.length > 0;
@@ -179,17 +187,16 @@ export default {
     async submit() {
       if (this.$refs.form.validate()) {
         if (this.importType === IMPORT_TYPE_AUTO) {
-          // this[FETCH_COURSE_LOG](/[a-z0-9]{26}/.exec(this.url)[0]);
+          this.getCourseLogs({
+            ACIXSTORE: /[a-z0-9]{26}/.exec(this.url)[0],
+            gd: this.gd,
+          });
         } else {
-          // this[LOG_COURSE_LOG](this.tempLogs);
+          this.logCourseLogs(this.tempLogs);
         }
-        this.setImportDialog(false);
-        // this.$vuetify.goTo('#course-log');
+        this.importDialog = false;
       }
     },
   },
 };
 </script>
-
-<style>
-</style>

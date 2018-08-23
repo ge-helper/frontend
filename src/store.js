@@ -86,6 +86,8 @@ const initialFilter = {
   times: [],
 };
 
+const BASE_URL = 'http://localhost:3000';
+
 Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
@@ -95,7 +97,8 @@ export default new Vuex.Store({
 
     importDialog: false,
     loading: false,
-    logs: [],
+    id: null,
+    courseLogs: [],
     candidates: [],
 
     search: '',
@@ -137,6 +140,40 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    async getCourseLogs({ commit }, { ACIXSTORE, gd }) {
+      commit('setLoading', true);
+      try {
+        const { id, courseLogs } = await fetch(
+          `${BASE_URL}/get_course_logs?ACIXSTORE=${ACIXSTORE}&gd=${gd.toString()}`
+        ).then(r => r.json());
+        commit('setId', id);
+        commit('setCourseLogs', courseLogs);
+        return true;
+      } catch (error) {
+        return false;
+      } finally {
+        commit('setLoading', false);
+      }
+    },
+    async logCourseLogs({ commit }, courseLogs) {
+      commit('setLoading', true);
+      const body = {
+        type: 'manual',
+        no: courseLogs.map(v => v.semester + v.no),
+        grade: courseLogs.map(v => v.grade),
+      };
+      const { id } = await fetch(`${BASE_URL}/log_course_logs`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }).then(r => r.json());
+      commit('setId', id);
+      commit('setCourseLogs', courseLogs);
+      commit('setLoading', false);
+    },
     doSearch({ commit, state }) {
       const { search } = state;
       let searchResults = GES;
@@ -211,8 +248,17 @@ export default new Vuex.Store({
       state.snackbarText = snackbarText;
       state.snackbar = true;
     },
+    setLoading(state, loading) {
+      state.loading = loading;
+    },
     setImportDialog(state, visible) {
       state.importDialog = visible;
+    },
+    setId(state, id) {
+      state.id = id;
+    },
+    setCourseLogs(state, courseLogs) {
+      state.courseLogs = courseLogs;
     },
     setSearch(state, search) {
       state.search = search;
