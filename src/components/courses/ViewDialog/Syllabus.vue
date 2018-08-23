@@ -10,7 +10,7 @@
       justify-center
       align-center>
       <v-progress-circular indeterminate
-        color="primary"></v-progress-circular>
+        color="primary" />
     </v-layout>
     <div class="pa-3"
       style="font-size: 13px;"

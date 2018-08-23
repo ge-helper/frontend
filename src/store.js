@@ -66,6 +66,24 @@ const mapCourseNo = GES.reduce((acc, cur) => {
   return acc;
 }, {});
 
+const mapGrade2Score = {
+  'A+': 95,
+  A: 87,
+  'A-': 82,
+  'B+': 78,
+  B: 74.5,
+  'B-': 71,
+  'C+': 68,
+  C: 64.5,
+  'C-': 61,
+  D: 54.5,
+  E: 0,
+  X: 0,
+  成績未到: '成績未到',
+  二退: '二退',
+  抵免: '抵免',
+};
+
 const counter = (obj, key) => {
   obj[key] = obj.hasOwnProperty(key) ? obj[key] + 1 : 1;
 };
@@ -97,9 +115,9 @@ export default new Vuex.Store({
 
     importDialog: false,
     loading: false,
-    id: null,
-    courseLogs: [],
-    candidates: [],
+    id: localStorage.getItem('id'),
+    courseLogs: JSON.parse(localStorage.getItem('courseLogs')) || [],
+    candidates: JSON.parse(localStorage.getItem('candidates')) || [],
 
     search: '',
     searchResults: GES,
@@ -147,7 +165,14 @@ export default new Vuex.Store({
           `${BASE_URL}/get_course_logs?ACIXSTORE=${ACIXSTORE}&gd=${gd.toString()}`
         ).then(r => r.json());
         commit('setId', id);
-        commit('setCourseLogs', courseLogs);
+        commit(
+          'setCourseLogs',
+          courseLogs.map(c => ({
+            course_no: c.semester + c.no,
+            course_title_zh: c.name,
+            grade: mapGrade2Score[c.grade],
+          }))
+        );
         return true;
       } catch (error) {
         return false;
@@ -171,7 +196,14 @@ export default new Vuex.Store({
         body: JSON.stringify(body),
       }).then(r => r.json());
       commit('setId', id);
-      commit('setCourseLogs', courseLogs);
+      commit(
+        'setCourseLogs',
+        courseLogs.map(c => ({
+          course_no: c.semester + c.no,
+          course_title_zh: c.name,
+          grade: mapGrade2Score[c.grade],
+        }))
+      );
       commit('setLoading', false);
     },
     doSearch({ commit, state }) {
@@ -256,9 +288,11 @@ export default new Vuex.Store({
     },
     setId(state, id) {
       state.id = id;
+      localStorage.setItem('id', state.id);
     },
     setCourseLogs(state, courseLogs) {
       state.courseLogs = courseLogs;
+      localStorage.setItem('courseLogs', JSON.stringify(state.courseLogs));
     },
     setSearch(state, search) {
       state.search = search;
@@ -284,11 +318,13 @@ export default new Vuex.Store({
     addCandidate(state, course_no) {
       if (state.candidates.indexOf(course_no) >= 0) return;
       state.candidates.push(course_no);
+      localStorage.setItem('candidates', JSON.stringify(state.candidates));
     },
     removeCandidate(state, course_no) {
       const loc = state.candidates.indexOf(course_no);
       if (loc === -1) return;
       state.candidates.splice(loc, 1);
+      localStorage.setItem('candidates', JSON.stringify(state.candidates));
     },
     setPagination(state, pagination) {
       state.pagination = { ...state.pagination, ...pagination };
