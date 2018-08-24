@@ -1,8 +1,10 @@
 <template>
-  <v-container style="max-width: 1000px;">
+  <v-container id="courses-list" style="max-width: 1000px;">
     <courses-sort/>
     <v-data-iterator :pagination.sync="pagination"
+      hide-actions
       rows-per-page-text="每頁筆數"
+      no-data-text="沒有符合的課程，換個關鍵字試試？"
       :items="results"
       style="max-width: 700px;">
       <v-card slot="item"
@@ -39,64 +41,38 @@
               <div style="width: 100%">
                 <v-layout wrap>
                   <v-flex xs12
-                    sm6>
-                    <span class="subheading font-weight-medium">{{ props.item.course_title_zh }}</span>
-                    <div class="body-1">
+                    sm8>
+                    <span class="subheading font-weight-medium">
+                      <v-chip label
+                        small
+                        class="caption ml-0"
+                        style="margin-top: 2px;">{{ props.item.category }}</v-chip>
+                      {{ props.item.course_title_zh }}
+                    </span>
+                    <div class="body-1 mt-2">
                       {{ `${props.item.credit} 學分．${props.item.time}．人數 ${props.item.enrollment}/${props.item.size_limit}` }}
                     </div>
                     <div class="body-1 grey--text">{{ props.item.teachers }}</div>
                     <v-layout align-center>
-
                     </v-layout>
                   </v-flex>
                   <v-flex v-if="$vuetify.breakpoint.smAndUp"
-                    sm6>
+                    sm4>
                     <v-layout align-end
                       column>
                       <h3>{{ `${mapScore(props.item.averageGrade)}` }}</h3>
-                      <div>
-                        <!-- <template v-for="i in 5">
-                          <v-icon v-if="Number.parseInt(props.item.averageGrade) < starIntervals[(i - 1) * 2]"
-                            small
-                            color="yellow darken-3"
-                            :key="i">star_border</v-icon>
-                          <v-icon v-else-if="Number.parseInt(props.item.averageGrade) < starIntervals[(i - 1) * 2 + 1]"
-                            small
-                            color="yellow darken-3"
-                            :key="i">star_half</v-icon>
-                          <v-icon v-else
-                            small
-                            color="yellow darken-3"
-                            :key="i">star</v-icon>
-                        </template> -->
-                      </div>
                       <span class="caption grey--text">{{ `(${props.item.totalStudent} 人平均成績)` }}</span>
                     </v-layout>
                   </v-flex>
                   <v-flex xs12
-                    v-else>
+                    v-else
+                    class="mt-1">
                     <v-layout align-center>
-                      <!-- <template v-for="i in 5">
-                        <v-icon v-if="Number.parseInt(props.item.averageGrade) < starIntervals[(i - 1) * 2]"
-                          small
-                          color="yellow darken-3"
-                          :key="i">star_border</v-icon>
-                        <v-icon v-else-if="Number.parseInt(props.item.averageGrade) < starIntervals[(i - 1) * 2 + 1]"
-                          small
-                          color="yellow darken-3"
-                          :key="i">star_half</v-icon>
-                        <v-icon v-else
-                          small
-                          color="yellow darken-3"
-                          :key="i">star</v-icon>
-                      </template> -->
                       <span class="body-2">{{ `${mapScore(props.item.averageGrade)}` }}</span>
-                      <span class="ml-1 caption grey--text">{{ `(${props.item.totalStudent} 人平均成績)` }}</span>
+                      <span class="ml-2 caption grey--text">{{ `(${props.item.totalStudent})` }}</span>
                     </v-layout>
-
                   </v-flex>
                 </v-layout>
-
                 <!-- <div>{{ props.item.searchScore }}</div>
                 <div>{{ props.item.recoScore }}</div>
                 <div>{{ props.item.popularity }}</div>  -->
@@ -108,6 +84,12 @@
         <v-divider class="my-2" />
       </v-card>
     </v-data-iterator>
+    <div class="text-xs-center pt-2"
+      style="max-width: 700px;">
+      <v-pagination v-model="pagination.page"
+        :length="pages"
+        @input="$vuetify.goTo('#courses-list');"/>
+    </div>
   </v-container>
 </template>
 
@@ -130,11 +112,26 @@ export default {
     ...mapGetters(['results']),
     pagination: {
       get() {
+        this.setPagination({
+          ...this.$store.state.pagination,
+          totalItems: this.results.length,
+        });
         return this.$store.state.pagination;
       },
       set(value) {
         this.setPagination(value);
       },
+    },
+    pages() {
+      if (
+        this.pagination.rowsPerPage == null ||
+        this.pagination.totalItems == null
+      )
+        return 0;
+
+      return Math.ceil(
+        this.pagination.totalItems / this.pagination.rowsPerPage
+      );
     },
   },
   methods: {
@@ -159,7 +156,7 @@ export default {
         'E',
         '資料不足',
       ];
-      const colors = ['light-blue darken-4']
+      const colors = ['light-blue darken-4'];
       for (let i = 0; i < scores.length; i++) {
         if (score >= scores[i]) {
           return grades[i];

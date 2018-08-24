@@ -3,30 +3,11 @@
     <v-container style="max-width: 1000px;">
       <h3 class="subheading">
         <span>{{ `${results.length} 個搜尋` }}</span>
-        <span class="font-weight-medium">{{ filter.search }}</span>結果
+        <span class="font-weight-medium"
+          :class="{'mx-1': !!search}">{{ search }}</span>結果
       </h3>
       <div>
         <filter-dialog :color="$vuetify.breakpoint.xs && chips.length ? 'primary' : 'secondary'" />
-        <v-menu v-if="!$vuetify.breakpoint.xs"
-          offset-y
-          :close-on-content-click="false">
-          <v-btn slot="activator"
-            outline
-            color="secondary">
-            分類
-            <v-icon right>arrow_drop_down</v-icon>
-          </v-btn>
-          <v-list dense>
-            <v-list-tile v-for="(opt, idx) in categoryOptions"
-              :key="idx">
-              <v-list-tile-action>
-                <v-checkbox v-model="categories"
-                  :value="opt[0]"
-                  :label="`${opt[0]} (${opt[1]})`" />
-              </v-list-tile-action>
-            </v-list-tile>
-          </v-list>
-        </v-menu>
       </div>
       <div v-if="!$vuetify.breakpoint.xs">
         <v-chip v-for="(c, i) in chips"
@@ -83,20 +64,8 @@ export default {
     'filter-dialog': FilterDialog,
   },
   computed: {
-    ...mapState(['filter', 'results']),
+    ...mapState(['search', 'filter', 'results']),
     ...mapGetters(['option']),
-    categoryOptions() {
-      return this.option.categoryOptions;
-    },
-    categories: {
-      get() {
-        return this.filter.categories;
-      },
-      set(value) {
-        this.setFilter({ categories: value });
-        this.doFilter();
-      },
-    },
     chips() {
       const output = [];
       const { filter } = this;

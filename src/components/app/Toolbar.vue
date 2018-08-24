@@ -2,17 +2,7 @@
   <v-toolbar id="toolbar"
     app
     class="white">
-    <v-btn flat
-      icon
-      @click="setDrawer(!drawer)">
-      <v-icon v-if="!candidates.length">shopping_cart</v-icon>
-      <v-badge v-else
-        right
-        color="teal">
-        <span slot="badge">{{ candidates.length }}</span>
-        <v-icon>shopping_cart</v-icon>
-      </v-badge>
-    </v-btn>
+    <v-toolbar-side-icon @click="setDrawer(!drawer)" />
     <v-toolbar-items>
       <v-btn flat
         to="/"
@@ -26,13 +16,13 @@
       icon
       to="/courses"
       class="hidden-md-and-up mr-0">
-      <v-icon>list</v-icon>
+      <v-icon>store</v-icon>
     </v-btn>
     <v-toolbar-items class="hidden-sm-and-down">
       <v-btn flat
         to="/courses">
         通識列表
-        <v-icon right>list</v-icon>
+        <v-icon right>store</v-icon>
       </v-btn>
     </v-toolbar-items>
   </v-toolbar>

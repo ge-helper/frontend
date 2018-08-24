@@ -25,8 +25,7 @@
             <v-container class="pb-0">
               <v-layout wrap>
                 <v-flex xs12
-                  v-if="$vuetify.breakpoint.xs"
-                  sm4
+                  sm6
                   class="mb-3">
                   <h4 class="mb-2">類別</h4>
                   <v-checkbox v-for="opt in categoryOptions"
@@ -38,31 +37,7 @@
                     :label="`${opt[0]} (${opt[1]})`" />
                 </v-flex>
                 <v-flex xs12
-                  sm4
-                  class="mb-3">
-                  <h4 class="mb-2">學分</h4>
-                  <v-checkbox v-for="opt in creditOptions"
-                    :key="opt[0]"
-                    v-model="credits"
-                    :value="opt[0]"
-                    hide-details
-                    class="mt-0"
-                    :label="`${opt[0]} (${opt[1]})`" />
-                </v-flex>
-                <v-flex xs12
-                  sm4
-                  class="mb-3">
-                  <h4 class="mb-2">授課語言</h4>
-                  <v-checkbox v-for="opt in languageOptions"
-                    :key="opt[0]"
-                    v-model="languages"
-                    :value="opt[0]"
-                    hide-details
-                    class="mt-0"
-                    :label="`${opt[0]} (${opt[1]})`" />
-                </v-flex>
-                <v-flex xs12
-                  sm4
+                  sm6
                   class="mb-3">
                   <h4 class="mb-2">開課單位</h4>
                   <v-checkbox v-for="opt in departmentOptions.slice(0, departmentOptionLimit)"
@@ -78,6 +53,30 @@
                     color="primary"
                     class="mx-0"
                     @click="departmentOptionLimit += 4">更多</v-btn>
+                </v-flex>
+                <v-flex xs12
+                  sm6
+                  class="mb-3">
+                  <h4 class="mb-2">學分</h4>
+                  <v-checkbox v-for="opt in creditOptions"
+                    :key="opt[0]"
+                    v-model="credits"
+                    :value="opt[0]"
+                    hide-details
+                    class="mt-0"
+                    :label="`${opt[0]} (${opt[1]})`" />
+                </v-flex>
+                <v-flex xs12
+                  sm6
+                  class="mb-3">
+                  <h4 class="mb-2">授課語言</h4>
+                  <v-checkbox v-for="opt in languageOptions"
+                    :key="opt[0]"
+                    v-model="languages"
+                    :value="opt[0]"
+                    hide-details
+                    class="mt-0"
+                    :label="`${opt[0]} (${opt[1]})`" />
                 </v-flex>
               </v-layout>
             </v-container>

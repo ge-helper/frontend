@@ -1,16 +1,20 @@
 <template>
   <div>
-    <div class="pt-3 px-3">
-      <h4 class="pb-2">平均分數</h4>
-      <div v-if="hasGradeDistribution">
-        <span>{{ `${viewCourse && viewCourse.averageGrade} 分` }}</span>
-        <span class="grey--text"
-          style="font-size: 13px;">
-          {{ averageGrade }}
-        </span>
-      </div>
-      <span v-else>資料不足</span>
-    </div>
+    <v-layout wrap>
+      <v-flex xs12
+        sm6
+        class="pt-3 px-3">
+        <h4 class="pb-2">類別</h4>
+        <span>{{ viewCourse && mapCategory[viewCourse.category] }}</span>
+      </v-flex>
+      <v-flex xs12
+        sm6
+        class="pt-3 px-3">
+        <h4 class="pb-2">平均分數</h4>
+        <span v-if="hasGradeDistribution">{{ `${viewCourse && viewCourse.averageGrade} 分` }}</span>
+        <span v-else>資料不足</span>
+      </v-flex>
+    </v-layout>
     <h4 class="px-3 pt-4">課程資訊</h4>
     <v-layout wrap>
       <v-flex v-for="i in 2"
@@ -62,11 +66,25 @@ const colors = [
   '#FFEB3B',
 ];
 
+const mapCategory = {
+  '': '',
+  人文: '人文學領域',
+  社會: '社會科學領域',
+  自然: '自然科學領域',
+  '核通 1': '核心通識向度一：思維方式',
+  '核通 2': '核心通識向度二：生命之探索',
+  '核通 3': '核心通識向度三：藝術與文學',
+  '核通 4': '核心通識向度四：社會與文化脈動',
+  '核通 5': '核心通識向度五：科學、技術與社會',
+  '核通 6': '核心通識向度六：歷史分析',
+};
+
 export default {
   name: 'CoursesViewDialogBasic',
   data() {
     return {
       chart: null,
+      mapCategory,
     };
   },
   computed: {
@@ -90,7 +108,6 @@ export default {
         capacity,
         enrollment,
         size_limit,
-        category,
       } = this.viewCourse;
       return [
         `科號：${course_no}`,
@@ -98,9 +115,9 @@ export default {
         `教師：${teachers}`,
         `授課語言：${language}`,
         `時間：${time}`,
-        `教室／容量：${room}／${capacity} 人`,
+        `教室：${room}`,
+        `教室容量：${capacity} 人`,
         `修課人數／人數上限：${enrollment}／${size_limit} 人`,
-        `類別：${category}`,
       ];
     },
     hasGradeDistribution() {

@@ -7,7 +7,7 @@
       <v-icon right>arrow_drop_down</v-icon>
     </v-btn>
     <v-list>
-      <v-list-tile v-for="(item, index) in ['相關程度', '熱門程度', '分數甜度']"
+      <v-list-tile v-for="(item, index) in ['相關性', '熱門程度', '分數甜度']"
         :key="index"
         @click="sort = item">
         <v-list-tile-title>{{ item }}</v-list-tile-title>
