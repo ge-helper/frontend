@@ -195,6 +195,7 @@ export default {
           this.logCourseLogs(this.tempLogs);
         }
         this.importDialog = false;
+        this.$vuetify.goTo('#course-log');
       }
     },
   },

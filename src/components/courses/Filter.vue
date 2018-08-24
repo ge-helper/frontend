@@ -1,6 +1,6 @@
 <template>
   <div class="blue-grey lighten-5">
-    <v-container style="max-width: 750px;">
+    <v-container style="max-width: 1000px;">
       <h3 class="subheading">
         <span>{{ `${results.length} 個搜尋` }}</span>
         <span class="font-weight-medium">{{ filter.search }}</span>結果

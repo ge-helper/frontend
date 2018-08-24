@@ -14,14 +14,14 @@
           <v-tab>基本資訊</v-tab>
           <v-tab>課程大綱</v-tab>
           <v-tab>更多資訊</v-tab>
-          <v-tab-item>
+          <v-tab-item style="min-height: calc(90vh - 155px);">
             <courses-view-dialog-basic/>
           </v-tab-item>
-          <v-tab-item>
-            <courses-view-dialog-syllabus/>
+          <v-tab-item style="min-height: calc(90vh - 155px);">
+            <courses-view-dialog-syllabus :style="$vuetify.breakpoint.xs ? 'min-height: calc(100vh - 155px);' : 'min-height: calc(90vh - 155px);'" />
           </v-tab-item>
           <v-tab-item>
-            <courses-view-dialog-more/>
+            <courses-view-dialog-more :style="$vuetify.breakpoint.xs ? 'min-height: calc(100vh - 155px);' : 'min-height: calc(90vh - 155px);'" />
           </v-tab-item>
         </v-tabs>
       </v-card-text>
@@ -29,7 +29,7 @@
       <v-card-actions>
         <v-spacer/>
         <v-btn flat
-          @click="setViewDialog(false)">取消</v-btn>
+          @click="viewDialog = false">關閉</v-btn>
         <v-btn v-if="viewCourse && candidates.includes(viewCourse.course_no)"
           color="error"
           flat

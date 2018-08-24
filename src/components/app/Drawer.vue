@@ -14,7 +14,8 @@
             avatar
             @click="openViewDialog(c.course_no)">
             <v-list-tile-avatar>
-              <img :src="require('@/assets/logo.png')">
+              <img style="width: 60px; height: 60px;"
+                :src="require(`@/assets/dept/${mapDept2Img[c.course_no.slice(5, 9)]}`)" />
             </v-list-tile-avatar>
             <v-list-tile-content>
               <v-list-tile-title>{{ c.course_title_zh }}</v-list-tile-title>
@@ -28,7 +29,7 @@
         column
         justify-center
         align-center>
-        <img :src="require('@/assets/logo.png')"
+        <img :src="require(`@/assets/dept/${deptImages[Math.floor(Math.random() * deptImages.length)]}`)"
           width="100">
         <div class="body-2">尚無候選課程</div>
         <div class="caption grey--text">
@@ -55,9 +56,16 @@
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex';
 import ClipboardJS from 'clipboard';
+import { mapDept2Img, deptImages } from '@/common/mapDept2Img';
 
 export default {
   name: 'AppDrawer',
+  data() {
+    return {
+      mapDept2Img,
+      deptImages,
+    };
+  },
   computed: {
     ...mapGetters(['candidateCourses']),
     drawer: {

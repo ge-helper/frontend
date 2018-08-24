@@ -3,6 +3,8 @@ import Vuex from 'vuex';
 import Fuse from 'fuse.js';
 import GE_10710 from '@/assets/GE_10710_0820.json';
 import GE_GRADE_DISTRIBUTION_10710 from '@/assets/GE_GRADE_DISTRIBUTION_32.json';
+import GE_SIMILARITY_COLUMNS from '@/assets/GE_SIMILARITY_COLUMNS_326_5.json';
+import GE_SIMILARITIES from '@/assets/GE_SIMILARITIES_326_5.json';
 
 const mapCategory = {
   '': '',
@@ -18,7 +20,7 @@ const mapCategory = {
   '核心通識Core GE courses 7': '核通 7',
 };
 
-const mapDepartment = {
+const mapDeptCode = {
   'BME ': '醫工所',
   BMES: '醫環系',
   'CHE ': '化工系',
@@ -45,28 +47,7 @@ const mapDepartment = {
   'XA  ': '抵免課程(大)',
 };
 
-const GES = GE_10710.map(ge => ({
-  ...ge,
-  teachers: ge.teachers.map(t => t.split('\t')[0]).join('、'),
-  room:
-    ge.room === ''
-      ? ''
-      : /[A-Za-z0-9_\- ]+(\W+) *(\w*)/
-          .exec(ge.room)
-          .slice(1, 3)
-          .join(' '),
-  category: mapCategory[ge.category],
-  department: mapDepartment[ge.course_no.slice(5, 9)],
-  language: ge.offered_in_english ? '英文' : '中文',
-  grade_distribution: GE_GRADE_DISTRIBUTION_10710[ge.course_no],
-}));
-
-const mapCourseNo = GES.reduce((acc, cur) => {
-  acc[cur.course_no] = cur;
-  return acc;
-}, {});
-
-const mapGrade2Score = {
+const mapGrade = {
   'A+': 95,
   A: 87,
   'A-': 82,
@@ -77,12 +58,37 @@ const mapGrade2Score = {
   C: 64.5,
   'C-': 61,
   D: 54.5,
-  E: 0,
+  E: 25,
   X: 0,
   成績未到: '成績未到',
   二退: '二退',
   抵免: '抵免',
 };
+
+const GES = GE_10710.map(ge => ({
+  ...ge,
+  ...GE_GRADE_DISTRIBUTION_10710[ge.course_no],
+  teachers: ge.teachers.map(t => t.split('\t')[0]).join('、'),
+  room:
+    ge.room === ''
+      ? ''
+      : /[A-Za-z0-9_\- ]+(\W+) *(\w*)/
+          .exec(ge.room)
+          .slice(1, 3)
+          .join(' '),
+  category: mapCategory[ge.category],
+  department: mapDeptCode[ge.course_no.slice(5, 9)],
+  language: ge.offered_in_english ? '英文' : '中文',
+  searchScore: 0,
+  reco: false,
+  recoScore: 0,
+  recoReasons: [],
+}));
+
+const mapCourseNo = GES.reduce((acc, cur) => {
+  acc[cur.course_no] = cur;
+  return acc;
+}, {});
 
 const counter = (obj, key) => {
   obj[key] = obj.hasOwnProperty(key) ? obj[key] + 1 : 1;
@@ -104,7 +110,8 @@ const initialFilter = {
   times: [],
 };
 
-const BASE_URL = 'http://localhost:3000';
+// const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://ge-helper.herokuapp.com';
 
 Vue.use(Vuex);
 export default new Vuex.Store({
@@ -124,12 +131,22 @@ export default new Vuex.Store({
     filter: { ...initialFilter },
     results: GES,
     pagination: {},
-    sort: '',
+    sort: '相關程度',
 
     viewDialog: false,
     view: null,
   },
   getters: {
+    geLogs({ courseLogs }) {
+      return courseLogs.filter(c => GE_SIMILARITY_COLUMNS.includes(c.name));
+    },
+    courseLogs({ courseLogs }) {
+      return courseLogs.map(c => ({
+        course_no: c.semester + c.no,
+        course_title_zh: c.name,
+        grade: mapGrade[c.grade],
+      }));
+    },
     option({ searchResults }) {
       const categoryCount = {},
         creditCount = {},
@@ -156,6 +173,83 @@ export default new Vuex.Store({
     candidateCourses({ candidates }) {
       return candidates.map(no => mapCourseNo[no]);
     },
+    results({ results, sort }, { courseLogs }) {
+      const recoScores = new Array(GE_SIMILARITY_COLUMNS.length).fill(0);
+      const recoSims = recoScores.map(v => new Set());
+
+      const logs = courseLogs.filter(
+        ({ course_title_zh, grade }) =>
+          !['二退', '成績未到', '抵免'].includes(grade) &&
+          GE_SIMILARITY_COLUMNS.includes(course_title_zh)
+      );
+      const titles = logs.map(c => c.course_title_zh);
+      const grades = logs.map(c => c.grade);
+      const averageGrade =
+        grades.reduce((acc, cur) => acc + cur, 0) / grades.length;
+      titles.forEach((course_title_zh, i) => {
+        const idx = GE_SIMILARITY_COLUMNS.indexOf(course_title_zh);
+        const sims = GE_SIMILARITIES[idx];
+        sims.forEach((sim, idx) => {
+          if (
+            sim !== null &&
+            sim > 0 &&
+            grades[i] >= averageGrade &&
+            !titles.includes(GE_SIMILARITY_COLUMNS[idx])
+          ) {
+            recoScores[idx] += sim * grades[i];
+            recoSims[idx].add(course_title_zh);
+          }
+        });
+      });
+      const reco = recoSims.reduce((acc, sims, idx) => {
+        if (!sims.size) return acc;
+        const title = GE_SIMILARITY_COLUMNS[idx];
+        acc[title] = {
+          reasons: [...sims],
+          score: recoScores[idx],
+        };
+        return acc;
+      }, {});
+      // console.log(reco);
+      const recoResults = results.map(r => {
+        if (!reco.hasOwnProperty(r.course_title_zh)) {
+          return {
+            ...r,
+            reco: false,
+            recoScore: 0,
+            recoReasons: [],
+          };
+        }
+        const { score, reasons } = reco[r.course_title_zh];
+        return {
+          ...r,
+          reco: score >= 90,
+          recoScore: score,
+          recoReasons: reasons,
+        };
+      });
+
+      if (sort === '相關程度') {
+        recoResults.sort((a, b) => {
+          if (b.recoScore === a.recoScore) return a.searchScore - b.searchScore;
+          return b.recoScore - a.recoScore;
+        });
+      } else if (sort === '熱門程度') {
+        recoResults.sort((a, b) => {
+          if (b.popularity === a.popularity)
+            return a.searchScore - b.searchScore;
+          return b.popularity - a.popularity;
+        });
+      } else if (sort === '分數甜度') {
+        recoResults.sort((a, b) => {
+          if (b.averageGrade === a.averageGrade)
+            return a.searchScore - b.searchScore;
+          return b.averageGrade - a.averageGrade;
+        });
+      }
+
+      return recoResults;
+    },
   },
   actions: {
     async getCourseLogs({ commit }, { ACIXSTORE, gd }) {
@@ -165,14 +259,7 @@ export default new Vuex.Store({
           `${BASE_URL}/get_course_logs?ACIXSTORE=${ACIXSTORE}&gd=${gd.toString()}`
         ).then(r => r.json());
         commit('setId', id);
-        commit(
-          'setCourseLogs',
-          courseLogs.map(c => ({
-            course_no: c.semester + c.no,
-            course_title_zh: c.name,
-            grade: mapGrade2Score[c.grade],
-          }))
-        );
+        commit('setCourseLogs', courseLogs);
         return true;
       } catch (error) {
         return false;
@@ -196,14 +283,7 @@ export default new Vuex.Store({
         body: JSON.stringify(body),
       }).then(r => r.json());
       commit('setId', id);
-      commit(
-        'setCourseLogs',
-        courseLogs.map(c => ({
-          course_no: c.semester + c.no,
-          course_title_zh: c.name,
-          grade: mapGrade2Score[c.grade],
-        }))
-      );
+      commit('setCourseLogs', courseLogs);
       commit('setLoading', false);
     },
     doSearch({ commit, state }) {
@@ -212,6 +292,7 @@ export default new Vuex.Store({
       if (search.trim() !== '') {
         const options = {
           shouldSort: true,
+          includeScore: true,
           threshold: 0.4,
           location: 0,
           distance: 100,
@@ -226,7 +307,10 @@ export default new Vuex.Store({
             'course_no',
           ],
         };
-        searchResults = new Fuse(GES, options).search(search);
+        searchResults = new Fuse(GES, options).search(search).map(r => ({
+          ...r.item,
+          searchScore: r.score,
+        }));
       }
       commit('setSearchResults', searchResults);
       commit('clearFilter');
@@ -267,6 +351,7 @@ export default new Vuex.Store({
         );
       }
       commit('setResults', results);
+      commit('setPagination', { page: 1 });
     },
   },
   mutations: {
@@ -291,8 +376,31 @@ export default new Vuex.Store({
       localStorage.setItem('id', state.id);
     },
     setCourseLogs(state, courseLogs) {
-      state.courseLogs = courseLogs;
+      state.courseLogs = courseLogs.map(c => ({
+        ...c,
+        isPassed: /[DEX]/.test(c.grade)
+          ? '未及格'
+          : /[ABC]+?/.test(c.grade)
+            ? '及格'
+            : c.grade,
+      }));
+      state.candidates.push(
+        ...courseLogs
+          .map(c => c.semester + c.no)
+          .filter(
+            no =>
+              mapCourseNo.hasOwnProperty(no) && !state.candidates.includes(no)
+          )
+      );
       localStorage.setItem('courseLogs', JSON.stringify(state.courseLogs));
+      localStorage.setItem('candidates', JSON.stringify(state.candidates));
+    },
+    clearCourseLogs(state) {
+      state.courseLogs = [];
+      state.id = null;
+
+      localStorage.removeItem('courseLogs');
+      localStorage.removeItem('id');
     },
     setSearch(state, search) {
       state.search = search;
@@ -309,6 +417,9 @@ export default new Vuex.Store({
     setResults(state, results) {
       state.results = results;
     },
+    setSort(state, sort) {
+      state.sort = sort;
+    },
     setView(state, view) {
       state.view = view;
     },
@@ -316,7 +427,7 @@ export default new Vuex.Store({
       state.viewDialog = visible;
     },
     addCandidate(state, course_no) {
-      if (state.candidates.indexOf(course_no) >= 0) return;
+      if (state.candidates.includes(course_no)) return;
       state.candidates.push(course_no);
       localStorage.setItem('candidates', JSON.stringify(state.candidates));
     },

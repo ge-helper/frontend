@@ -30,7 +30,10 @@
     </v-btn>
     <v-toolbar-items class="hidden-sm-and-down">
       <v-btn flat
-        to="/courses">通識列表</v-btn>
+        to="/courses">
+        通識列表
+        <v-icon right>list</v-icon>
+      </v-btn>
     </v-toolbar-items>
   </v-toolbar>
 </template>

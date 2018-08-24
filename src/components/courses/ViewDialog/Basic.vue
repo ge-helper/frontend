@@ -1,6 +1,17 @@
 <template>
   <div>
-    <h4 class="px-3 pt-3">課程資訊</h4>
+    <div class="pt-3 px-3">
+      <h4 class="pb-2">平均分數</h4>
+      <div v-if="hasGradeDistribution">
+        <span>{{ `${viewCourse && viewCourse.averageGrade} 分` }}</span>
+        <span class="grey--text"
+          style="font-size: 13px;">
+          {{ averageGrade }}
+        </span>
+      </div>
+      <span v-else>資料不足</span>
+    </div>
+    <h4 class="px-3 pt-4">課程資訊</h4>
     <v-layout wrap>
       <v-flex v-for="i in 2"
         :key="i"
@@ -17,16 +28,16 @@
         </v-list>
       </v-flex>
     </v-layout>
-    <div class="pa-3">
+    <div class="px-3 pt-4">
       <h4 class="pb-2">成績分佈</h4>
       <canvas v-show="hasGradeDistribution"
         ref="chart"
-        style="width: 100%;"/>
+        style="width: 100%;" />
       <p v-if="!hasGradeDistribution"
         class="ma-0"
         style="font-size: 13px;">資料不足</p>
     </div>
-    <div class="pa-3">
+    <div class="px-3 pt-4">
       <h4 class="pb-2">課程簡述</h4>
       <p class="ma-0"
         style="font-size: 13px;">
@@ -60,6 +71,13 @@ export default {
   },
   computed: {
     ...mapGetters(['viewCourse']),
+    averageGrade() {
+      const { viewCourse } = this;
+      if (!viewCourse) return '';
+      return `(根據 ${
+        Object.keys(viewCourse.gradeDistribution).length
+      } 次開課，共 ${viewCourse.totalStudent} 位修課同學平均)`;
+    },
     infos() {
       if (!this.viewCourse) return [];
       const {
@@ -87,7 +105,7 @@ export default {
     },
     hasGradeDistribution() {
       const { viewCourse } = this;
-      return viewCourse && Object.keys(viewCourse.grade_distribution).length;
+      return viewCourse && Object.keys(viewCourse.gradeDistribution).length;
     },
     description() {
       const { viewCourse } = this;
@@ -100,11 +118,11 @@ export default {
       const { viewCourse } = this;
       if (!viewCourse) return;
       const color = Chart.helpers.color;
-      const datasets = Object.keys(viewCourse.grade_distribution)
+      const datasets = Object.keys(viewCourse.gradeDistribution)
         .sort((a, b) => parseInt(b.slice(0, 5)) - parseInt(a.slice(0, 5)))
         .map((gd, idx) => ({
           label: gd.slice(0, 5),
-          data: viewCourse.grade_distribution[gd],
+          data: viewCourse.gradeDistribution[gd],
           backgroundColor: color(colors[idx])
             .alpha(0.5)
             .rgbString(),

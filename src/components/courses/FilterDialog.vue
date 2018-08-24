@@ -84,7 +84,7 @@
           </v-tab-item>
           <v-tab-item>
             <v-container>
-              <h4 class="mb-2">空堂時間（匯入修課紀錄自動勾選）</h4>
+              <h4 class="mb-2">空堂時間</h4>
               <!-- (13 + 1) * (5 + 1) -->
               <v-layout wrap
                 class="time-table"
@@ -109,9 +109,9 @@
           </v-tab-item>
         </v-tabs>
       </v-card-text>
-      <v-divider></v-divider>
+      <v-divider/>
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer/>
         <v-btn flat
           @click="dialogVisible = false">取消</v-btn>
         <v-btn color="primary"

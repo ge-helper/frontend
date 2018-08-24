@@ -43,15 +43,17 @@ export default {
       } = this.viewCourse;
       const output = [];
       output.push(`新生保留：${freshman_reserved} 人`);
-      if (note !== '') output.push(`備註：${note}`);
-      if (restriction !== '') output.push(`限制：${restriction}`);
+      output.push(`備註：${note === '' ? '無' : note}`);
+      output.push(`限制：${restriction === '' ? '無' : restriction}`);
       output.push(`通識對象：${mapObj[obj]}`);
-      if (prerequisites.length)
-        output.push(`先修：${prerequisites.join('、')}`);
-      if (requirements.length)
-        output.push(`必選修：${requirements.join('、')}`);
-      if (skills.length) output.push(`一二專：${skills.join('、')}`);
-      if (programs.length) output.push(`學分學程：${programs.join('、')}`);
+      output.push(
+        `先修：${prerequisites.length ? prerequisites.join('、') : '無'}`
+      );
+      output.push(
+        `必選修：${requirements.length ? requirements.join('、') : '無'}`
+      );
+      output.push(`一二專：${skills.length ? skills.join('、') : '無'}`);
+      output.push(`學分學程：${programs.length ? programs.join('、') : '無'}`);
       return output;
     },
   },

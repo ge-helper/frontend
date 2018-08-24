@@ -8,20 +8,30 @@
       <h4 class="subheading mb-3">為您推薦適合的通識課程</h4>
       <div>
         <v-btn color="primary"
-          @click="setImportDialog(true)">匯入修課紀錄</v-btn>
-        <v-btn>使用範例紀錄</v-btn>
+          @click="setImportDialog(true)"
+          :loading="loading">匯入修課紀錄</v-btn>
+        <v-btn @click="useExampleCourseLog">使用範例紀錄</v-btn>
       </div>
     </v-layout>
   </v-parallax>
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
+import { exampleCourseLogs } from '@/common/exampleCourseLogs';
 
 export default {
   name: 'HomeHero',
+  computed: {
+    ...mapState(['loading']),
+  },
   methods: {
-    ...mapMutations(['setImportDialog']),
+    ...mapMutations(['setImportDialog', 'setId', 'setCourseLogs']),
+    useExampleCourseLog() {
+      this.setId(null);
+      this.setCourseLogs(exampleCourseLogs);
+      this.$vuetify.goTo('#course-log');
+    },
   },
 };
 </script>
