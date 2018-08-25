@@ -84,16 +84,16 @@
             </v-list-tile-sub-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile v-show="candidateCourses.length"
-          ref="copy"
-          :data-clipboard-text="candidateString"
-          avatar
-          @click="copy">
-          <v-list-tile-action/>
+        <v-list-tile v-show="candidateCourses.length">
           <v-list-tile-content>
-            <v-list-tile-title class="primary--text">
+            <v-btn ref="copy"
+              :data-clipboard-text="candidateString"
+              flat
+              block
+              @click="copy"
+              color="primary">
               複製科號與課名
-            </v-list-tile-title>
+            </v-btn>
           </v-list-tile-content>
         </v-list-tile>
       </v-list-group>
@@ -158,7 +158,7 @@ export default {
     copy() {
       FB.AppEvents.logEvent('copy');
       this.launchSnackbar('複製成功');
-    }
+    },
   },
   mounted() {
     new ClipboardJS(this.$refs.copy.$el);
