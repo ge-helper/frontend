@@ -5,10 +5,10 @@
     justify-center
     fill-height>
     <h1 class="display-2 mb-3">清大通識小幫手</h1>
-    <h4 class="subheading mb-3">收錄 118 堂通識成績分佈</h4>
+    <h4 class="subheading mb-3">收錄 116 堂通識成績分佈</h4>
     <div>
       <v-btn color="primary"
-        @click="setImportDialog(true)"
+        @click="openImportDialog"
         :loading="loading">匯入通識紀錄</v-btn>
       <v-btn to="/courses">查看通識列表</v-btn>
     </div>
@@ -25,6 +25,10 @@ export default {
   },
   methods: {
     ...mapMutations(['setImportDialog']),
+    openImportDialog() {
+      FB.AppEvents.logEvent('importStart');
+      this.setImportDialog(true);
+    },
   },
 };
 </script>

@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Fuse from 'fuse.js';
-import GE_10710 from '@/assets/GE_10710_0820.json';
-import GE_CAT_CREDIT from '@/assets/GE_10310_10710_CAT_CREDIT.json';
+import GE_10710 from '@/assets/GE_10710_0825.json';
+import GE_CAT_CREDIT from '@/assets/GE_CAT_CREDIT_0825.json';
 import GE_GRADE_DISTRIBUTION_10710 from '@/assets/GE_GRADE_DISTRIBUTION_32.json';
-import GE_SIMILARITY_COLUMNS from '@/assets/GE_SIMILARITY_COLUMNS_326_5.json';
-import GE_SIMILARITIES from '@/assets/GE_SIMILARITIES_326_5.json';
+import GE_SIMILARITY_COLUMNS from '@/assets/GE_SIMILARITY_COLUMNS_339_5.json';
+import GE_SIMILARITIES from '@/assets/GE_SIMILARITIES_339_5.json';
 
 const mapCategory = {
   '': '',
@@ -116,6 +116,12 @@ const sorter = obj => {
   return ret;
 };
 
+const getCookie = name => {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  if (match) return match[2];
+  return null;
+};
+
 const initialFilter = {
   categories: [],
   credits: [],
@@ -131,6 +137,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     drawer: true,
+    drawerCart: false,
+    drawerHistory: false,
     snackbar: false,
     snackbarText: '',
 
@@ -153,9 +161,6 @@ export default new Vuex.Store({
     view: null,
   },
   getters: {
-    // geLogs({ courseLogs }) {
-    //   return courseLogs.filter(c => GE_SIMILARITY_COLUMNS.includes(c.name));
-    // },
     geLogs({ courseLogs }) {
       const geLogs = courseLogs
         .filter(c => GE_CAT_CREDIT.hasOwnProperty(c.semester + c.no))
@@ -213,8 +218,7 @@ export default new Vuex.Store({
       );
       const titles = logs.map(c => c.course_title_zh);
       const scores = logs.map(c => mapGrade[c.grade]);
-      const averageGrade =
-        scores.reduce((acc, cur) => acc + cur, 0) / scores.length;
+
       titles.forEach((course_title_zh, i) => {
         const idx = GE_SIMILARITY_COLUMNS.indexOf(course_title_zh);
         const sims = GE_SIMILARITIES[idx];
@@ -222,7 +226,7 @@ export default new Vuex.Store({
           if (
             sim !== null &&
             sim > 0 &&
-            scores[i] >= averageGrade &&
+            scores[i] >= 70 &&
             !titles.includes(GE_SIMILARITY_COLUMNS[idx])
           ) {
             recoScores[idx] += sim * scores[i];
@@ -294,7 +298,7 @@ export default new Vuex.Store({
         return false;
       } finally {
         commit('setLoading', false);
-        commit('launchSnackbar', '匯入成功');
+        commit('launchSnackbar', '匯入成功！到通識列表逛逛～');
       }
     },
     async logCourseLogs({ commit }, courseLogs) {
@@ -384,10 +388,30 @@ export default new Vuex.Store({
       commit('setResults', results);
       commit('setPagination', { page: 1 });
     },
+    logCartLogs({ state }) {
+      const { id, candidates } = state;
+      fetch(`${BASE_URL}/log_cart_logs`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: id || getCookie('_gid'),
+          candidates,
+        }),
+      }).then(r => console.log(r.status));
+    },
   },
   mutations: {
     setDrawer(state, visible) {
       state.drawer = visible;
+    },
+    setDrawerCart(state, visible) {
+      state.drawerCart = visible;
+    },
+    setDrawerHistory(state, visible) {
+      state.drawerHistory = visible;
     },
     setSnackbar(state, visible) {
       state.snackbar = visible;

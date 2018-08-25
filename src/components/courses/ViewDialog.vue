@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations } from 'vuex';
+import { mapState, mapActions, mapGetters, mapMutations } from 'vuex';
 import Basic from '@/components/courses/ViewDialog/Basic';
 import Syllabus from '@/components/courses/ViewDialog/Syllabus';
 import More from '@/components/courses/ViewDialog/More';
@@ -65,12 +65,29 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(['setViewDialog', 'addCandidate', 'removeCandidate']),
+    ...mapActions(['logCartLogs']),
+    ...mapMutations([
+      'setViewDialog',
+      'addCandidate',
+      'removeCandidate',
+      'setDrawer',
+      'setDrawerCart',
+      'launchSnackbar',
+    ]),
     addCourse() {
+      FB.AppEvents.logEvent('addCourse');
+      this.logCartLogs();
+      if (!this.candidates.length) {
+        this.launchSnackbar('加入成功！你可以在側邊欄找到候選清單～');
+        this.setDrawer(true);
+        this.setDrawerCart(true);
+      }
       this.addCandidate(this.viewCourse.course_no);
       this.setViewDialog(false);
     },
     removeCourse() {
+      FB.AppEvents.logEvent('removeCourse');
+      this.logCartLogs();
       this.removeCandidate(this.viewCourse.course_no);
       this.setViewDialog(false);
     },

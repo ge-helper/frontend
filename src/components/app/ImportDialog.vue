@@ -44,7 +44,7 @@
                 <v-layout wrap>
                   <v-flex xs12
                     sm6
-                    @click="step++, importType = IMPORT_TYPE_AUTO"
+                    @click="auto"
                     style="cursor: pointer;">
                     <v-card>
                       <v-card-title>
@@ -56,7 +56,7 @@
                   </v-flex>
                   <v-flex xs12
                     sm6
-                    @click="step++, importType = IMPORT_TYPE_MANUAL"
+                    @click="manual"
                     style="cursor: pointer;">
                     <v-card>
                       <v-card-title>
@@ -116,7 +116,7 @@
         <v-btn v-show="step === 1"
           color="primary"
           flat
-          @click="step++">我同意</v-btn>
+          @click="agree">我同意</v-btn>
         <v-btn v-show="step === 3"
           flat
           color="primary"
@@ -178,14 +178,29 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(['setImportDialog']),
+    ...mapMutations(['setImportDialog', 'setDrawerHistory', 'setDrawer']),
     ...mapActions(['getCourseLogs', 'logCourseLogs']),
     validateText(v) {
       this.tempLogs = parseCourseLog(v);
       return this.tempLogs.length > 0;
     },
+    agree() {
+      FB.AppEvents.logEvent('importAgree');
+      this.step++;
+    },
+    auto() {
+      FB.AppEvents.logEvent('importAuto');
+      this.step++;
+      this.importType = IMPORT_TYPE_AUTO;
+    },
+    manual() {
+      FB.AppEvents.logEvent('importManual');
+      this.step++;
+      this.importType = IMPORT_TYPE_MANUAL;
+    },
     async submit() {
       if (this.$refs.form.validate()) {
+        FB.AppEvents.logEvent('importEnd');
         if (this.importType === IMPORT_TYPE_AUTO) {
           this.getCourseLogs({
             ACIXSTORE: /[a-z0-9]{26}/.exec(this.url)[0],
@@ -195,6 +210,8 @@ export default {
           this.logCourseLogs(this.tempLogs);
         }
         this.importDialog = false;
+        this.setDrawer(true);
+        this.setDrawerHistory(true);
       }
     },
   },

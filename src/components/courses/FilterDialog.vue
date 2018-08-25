@@ -6,7 +6,8 @@
     <v-btn slot="activator"
       outline
       :color="color"
-      class="ml-0 my-3">
+      class="ml-0 my-3"
+      @click="openFilterDialog">
       <v-icon left
         dark>filter_list</v-icon>
       篩選器
@@ -16,7 +17,9 @@
       <v-divider></v-divider>
       <v-card-text class="pa-0"
         style="min-height: calc(100% - 107px);-webkit-overflow-scrolling: touch;">
-        <v-tabs color="cyan"
+        <v-tabs v-model="tabs"
+          grow
+          color="cyan"
           slider-color="yellow"
           dark>
           <v-tab>一般</v-tab>
@@ -152,6 +155,7 @@ export default {
   data() {
     return {
       dialog: false,
+      tabs: null,
       departmentOptionLimit: 3,
       columnHeaders,
       rowHeaders,
@@ -204,7 +208,11 @@ export default {
   methods: {
     ...mapActions(['doFilter']),
     ...mapMutations(['setFilter']),
+    openFilterDialog() {
+      FB.AppEvents.logEvent('filterStart');
+    },
     applyFilter() {
+      FB.AppEvents.logEvent('filterEnd');
       const { categories, credits, languages, departments, times } = this;
       this.setFilter({
         categories,

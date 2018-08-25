@@ -1,15 +1,15 @@
 <template>
   <v-menu offset-y>
     <v-btn slot="activator"
-      flat
+      outline
       class="ml-0">
       {{ `排序方式：${sort}` }}
       <v-icon right>arrow_drop_down</v-icon>
     </v-btn>
     <v-list>
-      <v-list-tile v-for="(item, index) in ['相關性', '熱門程度', '分數甜度']"
+      <v-list-tile v-for="(item, index) in ['相關性', '分數甜度', '熱門程度']"
         :key="index"
-        @click="sort = item">
+        @click="select(item)">
         <v-list-tile-title>{{ item }}</v-list-tile-title>
       </v-list-tile>
     </v-list>
@@ -18,6 +18,12 @@
 
 <script>
 import { mapMutations } from 'vuex';
+
+const sortType = {
+  相關性: 'sortRelevance',
+  分數甜度: 'sortSweet',
+  熱門程度: 'sortHot',
+};
 
 export default {
   name: 'CoursesSort',
@@ -32,7 +38,12 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(['setSort']),
+    ...mapMutations(['setSort', 'setPagination']),
+    select(item) {
+      FB.AppEvents.logEvent(sortType[item]);
+      this.sort = item;
+      this.setPagination({ page: 1 });
+    },
   },
 };
 </script>

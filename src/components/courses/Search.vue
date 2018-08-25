@@ -1,6 +1,6 @@
 <template>
   <v-jumbotron color="primary"
-    gradient="220deg,#2C3E50 -10%,#4CA1AF 70%"
+    gradient="220deg,#4568dc -10%,#12c2e9 70%"
     :style="{'height': $vuetify.breakpoint.xs ? '80px' : '100px'}">
     <v-container fill-height
       style="max-width: 1000px;">
@@ -36,6 +36,7 @@ export default {
   methods: {
     ...mapMutations(['setSearch']),
     doSearch() {
+      FB.AppEvents.logEvent('search');
       if (this.preSearch.trim() === this.search.trim()) return;
       this.setSearch(this.preSearch);
       this.$store.dispatch('doSearch');
@@ -43,6 +44,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

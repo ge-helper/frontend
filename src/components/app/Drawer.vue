@@ -3,12 +3,16 @@
     v-model="drawer">
     <v-list expand
       class="py-0">
-      <v-list-group prepend-icon="history">
+      <v-list-group v-model="drawerHistory">
         <v-list-tile slot="activator">
           <v-list-tile-content>
             <v-list-tile-title class="subheading">通識紀錄</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <v-progress-linear v-if="loading"
+          indeterminate
+          class="my-0"
+          height="3" />
         <v-list-tile v-for="(c, i) in geLogs"
           :key="i"
           avatar>
@@ -17,15 +21,14 @@
           </v-list-tile-avatar>
           <v-list-tile-content>
             <v-list-tile-title>{{ c.course_title_zh }}</v-list-tile-title>
-            <v-list-tile-sub-title class="grey--text">{{ `${c.category}．${c.credit} 學分．${c.grade}` }}</v-list-tile-sub-title>
+            <v-list-tile-sub-title class="grey--text">
+              <span>{{ `${c.category}．${c.credit} 學分．` }}</span>
+              <span :class="{'primary--text': c.grade === '成績未到'}">{{ c.grade }}</span>
+            </v-list-tile-sub-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-progress-linear v-if="loading"
-          indeterminate
-          class="my-0"
-          height="3" />
         <v-list-tile v-if="!geLogs.length"
-          @click="setImportDialog(true)">
+          @click="openImportDialog">
           <v-list-tile-action/>
           <v-list-tile-content>
             <v-list-tile-title v-if="!loading">
@@ -38,7 +41,7 @@
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile v-else
-          @click="clearCourseLogs">
+          @click="clear">
           <v-list-tile-action/>
           <v-list-tile-content>
             <v-list-tile-title class="red--text">
@@ -47,7 +50,7 @@
           </v-list-tile-content>
         </v-list-tile>
       </v-list-group>
-      <v-list-group prepend-icon="shopping_cart">
+      <v-list-group v-model="drawerCart">
         <v-list-tile slot="activator">
           <v-list-tile-content>
             <v-list-tile-title class="subheading">候選清單</v-list-tile-title>
@@ -85,7 +88,7 @@
           ref="copy"
           :data-clipboard-text="candidateString"
           avatar
-          @click="launchSnackbar('複製成功')">
+          @click="copy">
           <v-list-tile-action/>
           <v-list-tile-content>
             <v-list-tile-title class="primary--text">
@@ -117,6 +120,14 @@ export default {
       get: mapState(['drawer']).drawer,
       set: mapMutations(['setDrawer']).setDrawer,
     },
+    drawerCart: {
+      get: mapState(['drawerCart']).drawerCart,
+      set: mapMutations(['setDrawerCart']).setDrawerCart,
+    },
+    drawerHistory: {
+      get: mapState(['drawerHistory']).drawerHistory,
+      set: mapMutations(['setDrawerHistory']).setDrawerHistory,
+    },
     candidateString() {
       return this.candidateCourses
         .map(c => `${c.course_no}\t${c.course_title_zh}`)
@@ -132,9 +143,22 @@ export default {
       'clearCourseLogs',
     ]),
     openViewDialog(course_no) {
+      FB.AppEvents.logEvent('viewCourse');
       this.setView(course_no);
       this.setViewDialog(true);
     },
+    openImportDialog() {
+      FB.AppEvents.logEvent('importStart');
+      this.setImportDialog(true);
+    },
+    clear() {
+      FB.AppEvents.logEvent('clearCourseLogs');
+      this.clearCourseLogs();
+    },
+    copy() {
+      FB.AppEvents.logEvent('copy');
+      this.launchSnackbar('複製成功');
+    }
   },
   mounted() {
     new ClipboardJS(this.$refs.copy.$el);
