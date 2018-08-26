@@ -12,7 +12,7 @@
         slot-scope="props"
         flat
         class="my-3 transparent"
-        @click.native="openViewDialog(props.item.course_no)"
+        @click.native="openViewDialog(props.item.course_no, props.item.reco)"
         style="cursor: pointer;">
         <v-layout>
           <v-flex style="flex: 0 0 auto; width: 20%; max-width: 48px; margin: 4px;">
@@ -139,10 +139,14 @@ export default {
   },
   methods: {
     ...mapMutations(['setView', 'setViewDialog', 'setPagination']),
-    openViewDialog(course_no) {
+    openViewDialog(course_no, reco) {
+      FB.AppEvents.logEvent('recoViewDen');
       FB.AppEvents.logEvent('viewCourse');
       this.setView(course_no);
       this.setViewDialog(true);
+      if (reco) {
+        FB.AppEvents.logEvent('recoViewNum');
+      }
     },
     mapScore(score) {
       const scores = [90, 85, 80, 77, 73, 70, 67, 63, 60, 50, 1, 0];

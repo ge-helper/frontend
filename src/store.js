@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import Fuse from 'fuse.js';
 import GE_10710 from '@/assets/GE_10710_0825.json';
 import GE_CAT_CREDIT from '@/assets/GE_CAT_CREDIT_0825.json';
-import GE_GRADE_DISTRIBUTION_10710 from '@/assets/GE_GRADE_DISTRIBUTION_32.json';
+import GE_GRADE_DISTRIBUTION_10710 from '@/assets/GE_GRADE_DISTRIBUTION_48.json';
 import GE_SIMILARITY_COLUMNS from '@/assets/GE_SIMILARITY_COLUMNS_339_5.json';
 import GE_SIMILARITIES from '@/assets/GE_SIMILARITIES_339_5.json';
 
