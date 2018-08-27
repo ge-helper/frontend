@@ -5,7 +5,7 @@
     justify-center
     fill-height>
     <h1 class="display-2 mb-3">清大通識小幫手</h1>
-    <h4 class="subheading mb-3">收錄 146 堂通識成績分佈</h4>
+    <h4 class="subheading mb-3">收錄 161 堂通識成績分佈</h4>
     <div>
       <v-btn color="primary"
         @click="openImportDialog"
